@@ -1,0 +1,8 @@
+{
+  "globalHeaders": {
+    "X-Robots-Tag": "noindex, nofollow"
+  },
+  "routes": [
+    { "route": "/*.md", "statusCode": 404 }
+  ]
+}

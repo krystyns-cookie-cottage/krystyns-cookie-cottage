@@ -1,0 +1,8 @@
+date,time,title,venue,description,price,seats_left,seats_total,ticket_link,status
+2026-09-21,2:00 pm,Hello Harvest,"Rugged & Refined, Greencastle","A chunky cable-knit pumpkin, a classic white pumpkin and a pumpkin spice latte.",50,0,20,https://ticketstripe.com/harvest-decorating-cookie-class,sold out
+2026-10-24,2:00 pm,Spooky Sweet Cookie Class,"Rugged & Refined, Greencastle","A blushing pumpkin, a little ghost and a witch hat. Cute, not creepy.",50,0,20,,sold out
+2026-11-14,1:00 pm,Friendsgiving Cookie Class,"Rugged & Refined, Greencastle","Pies, a turkey and a ""thankful"" plaque. Bring a friend and a mug.",50,7,20,,
+2026-12-05,1:00 pm,Holiday Cheer,"Rugged & Refined, Greencastle","Sweaters, a snowy cottage and a gingerbread friend for the cookie tin.",55,14,20,,
+2026-12-12,10:00 am,Little Elves Kids Class,Chambersburg (venue TBA),A short sprinkle-heavy class for decorators ages 6 to 12.,35,9,16,,
+2026-12-19,9:00 am to 3:00 pm,Holiday Market Pop-Up,Chambersburg (venue TBA),Grab-and-go cookie boxes and bakery-style treats while they last.,Free to attend,,,,
+2027-01-09,1:00 pm,Draft: Snowflake Class,TBA,Not ready to show yet.,50,20,20,,hidden
