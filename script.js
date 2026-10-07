@@ -198,11 +198,29 @@
   }
 
   /* ---------------- gallery ---------------- */
+  // "Everything" starts with the first dozen sets; a filter or "See all" shows the rest
+  const PREVIEW = 12, moreBtn = $('#galleryMore');
+  let filter = 'all', expanded = false;
+  function applyGallery() {
+    let shown = 0;
+    $$('#masonry li').forEach(li => {
+      const match = filter === 'all' || li.dataset.cat === filter;
+      li.hidden = !match || (filter === 'all' && !expanded && shown >= PREVIEW);
+      if (match) shown++;
+    });
+    moreBtn.hidden = filter !== 'all' || expanded || shown <= PREVIEW;
+  }
   $$('.chip').forEach(chip => chip.addEventListener('click', () => {
     $$('.chip').forEach(c => { c.classList.toggle('is-active', c === chip); c.setAttribute('aria-pressed', c === chip); });
-    const f = chip.dataset.filter;
-    $$('#masonry li').forEach(li => { li.hidden = f !== 'all' && li.dataset.cat !== f; });
+    filter = chip.dataset.filter;
+    applyGallery();
   }));
+  moreBtn.addEventListener('click', () => {
+    expanded = true;
+    applyGallery();
+    $$('#masonry li')[PREVIEW].querySelector('.tile').focus({ preventScroll: true });
+  });
+  applyGallery();
 
   const lightbox = $('#lightbox'), lbImg = $('#lightboxImg'), lbCap = $('#lightboxCap');
   $$('.tile').forEach(tile => tile.addEventListener('click', () => {

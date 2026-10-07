@@ -139,6 +139,8 @@ p { margin: 0; }
 .masonry { list-style: none; margin: 0; padding: 0; columns: 3 260px; column-gap: 18px; }
 .masonry li { break-inside: avoid; margin-bottom: 18px; }
 .masonry li[hidden] { display: none; }
+[hidden].btn { display: none; }
+.gallery-more { display: flex; justify-content: center; margin-top: 8px; }
 .tile {
   display: block; width: 100%; padding: 0; border: 0; background: var(--white); cursor: zoom-in;
   border-radius: var(--radius-soft); overflow: hidden; text-align: left; color: var(--forest);
