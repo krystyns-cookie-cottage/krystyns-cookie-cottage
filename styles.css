@@ -1,7 +1,7 @@
 /* Krystyn's Cookie Cottage
    Palette pulled from her "Meet your baker" card: blush, sage, forest ink, cookie gold. */
 :root {
-  --paper: #FAF2EB;      /* matches her logo's background */
+  --paper: #FBF1E8;      /* matches her logo's background */
   --paper-2: #F7E8E2;
   --blush: #EFC6BF;
   --blush-deep: #D98F8A;
@@ -383,7 +383,7 @@ dialog::backdrop { background: rgba(51, 66, 47, .6); backdrop-filter: blur(3px);
     padding-top: 20px; text-align: center; justify-items: center;
   }
   .hero-visual { order: -1; width: min(64vw, 300px); margin: 0 auto 30px; }
-  .cookie-slot { right: -20%; bottom: -10%; width: clamp(92px, 26vw, 120px); }
+  .cookie-slot { right: -34%; bottom: -14%; width: clamp(92px, 26vw, 120px); }
   .hero-note { right: auto; left: -14%; bottom: -16%; font-size: 1.2rem; text-align: left; transform: rotate(-5deg); }
   .note-arrow { display: none; }
   .hero-copy { max-width: 600px; }
@@ -476,3 +476,4 @@ dialog::backdrop { background: rgba(51, 66, 47, .6); backdrop-filter: blur(3px);
   .ribbon-track { animation: none; }
   .tile img, .btn { transition: none; }
 }
+.nowrap { white-space: nowrap; }
