@@ -174,6 +174,7 @@ p { margin: 0; }
 .steps h3 { font-size: 1.35rem; }
 .steps p { margin-top: 6px; color: var(--forest-soft); }
 .custom-cta { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 26px 30px; background: var(--paper-2); border-radius: var(--radius-soft); }
+.custom-cta .handnote { flex: 1 1 340px; max-width: 54ch; }
 
 /* ---------- classes ---------- */
 .class-feature { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 52px); align-items: center; margin-bottom: 52px; }
