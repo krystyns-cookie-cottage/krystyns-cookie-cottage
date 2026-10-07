@@ -155,6 +155,10 @@ p { margin: 0; }
 .custom-intro p { margin-top: 16px; color: var(--forest-soft); max-width: 44ch; }
 .flavors { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .flavors li { background: var(--blush); padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: .92rem; }
+.flavors li.signature { background: var(--forest); color: var(--white); }
+.flavors li.signature::before { content: "♥"; color: var(--blush); margin-right: 6px; }
+.custom-intro .flavor-note { margin-top: 16px; padding-left: 14px; border-left: 3px solid var(--blush); font-size: .98rem; max-width: 46ch; }
+.flavor-note strong { color: var(--forest); }
 .steps { list-style: none; counter-reset: step; margin: 0; padding: 0; display: grid; gap: 14px; }
 .steps li {
   counter-increment: step; position: relative;
