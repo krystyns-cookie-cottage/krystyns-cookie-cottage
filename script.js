@@ -21,17 +21,6 @@
   const cookie = $('#cookie'), inner = $('#cookieInner'), slot = $('.cookie-slot');
   const allGone = $('#allGone');
 
-  // piped white dot border on the icing
-  const dots = $('#pipedDots');
-  for (let i = 0; i < 30; i++) {
-    const a = i / 30 * Math.PI * 2;
-    const c = document.createElementNS(SVGNS, 'circle');
-    c.setAttribute('cx', 100 + Math.cos(a) * 72);
-    c.setAttribute('cy', 99 + Math.sin(a) * 72);
-    c.setAttribute('r', 3.1);
-    dots.appendChild(c);
-  }
-
   // Each bite is a scalloped cluster of circles (tooth marks). Angles in degrees, 0 = right.
   const BITES = [
     { a: -38, d: 100, r: 30 },
@@ -145,7 +134,7 @@
 
   /* ---------------- crumbs ---------------- */
   const canvas = $('#crumbs'), ctx = canvas.getContext('2d');
-  const COLORS = ['#D49A5C', '#C38548', '#EAC690', '#E2AE70', '#EDB9B2', '#FFFDF9', '#A3B296'];
+  const COLORS = ['#D49A5C', '#B9783C', '#EDC88E', '#E2AE70', '#4A2816', '#5A3520', '#3A1F10'];
   let crumbs = [], W = 0, H = 0, dpr = 1, running = false;
 
   function resizeCanvas() {
@@ -163,7 +152,7 @@
       const a = i / k * Math.PI * 2, rr = size * (.6 + Math.random() * .5);
       pts.push([Math.cos(a) * rr, Math.sin(a) * rr]);
     }
-    // icing bits are pink/white, cookie bits are golden
+    // mostly golden cookie crumbs, some chocolate bits
     const color = COLORS[Math.random() < .7 ? (Math.random() * 4 | 0) : 4 + (Math.random() * 3 | 0)];
     crumbs.push({ x, y, vx, vy, rot: Math.random() * 6, vr: (Math.random() - .5) * .3, pts, size, color, rest: 0, alpha: 1 });
     if (crumbs.length > 320) crumbs.splice(0, crumbs.length - 320);
