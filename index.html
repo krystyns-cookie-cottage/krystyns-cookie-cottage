@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Allura&family=Caveat:wght@500;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Young+Serif&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=15">
+  <link rel="stylesheet" href="styles.css?v=17">
 </head>
 <body>
 
@@ -42,7 +42,13 @@
       <span class="brand-sub">Cookie Cottage</span>
     </span>
   </a>
-  <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
+  <div class="header-actions">
+    <a class="btn btn-small header-order" href="#order">Order cookies</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+      <svg class="icon-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <svg class="icon-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
   <nav id="site-nav" class="site-nav" aria-label="Main">
     <a href="#gallery">Gallery</a>
     <a href="#custom">Custom cookies</a>
@@ -469,6 +475,6 @@
 </dialog>
 
 
-<script src="script.js?v=15"></script>
+<script src="script.js?v=17"></script>
 </body>
 </html>
