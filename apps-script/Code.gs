@@ -75,7 +75,7 @@ function doPost(e) {
     const sheet = ordersSheet_();
     const [y, m, d] = order.date.split('-').map(Number);
     sheet.appendRow([
-      new Date(), order.name, order.email, order.phone, new Date(y, m - 1, d), order.occasion,
+      new Date(), order.name, order.email, order.phone, '=DATE(' + y + ',' + m + ',' + d + ')', order.occasion,
       order.quantity, order.flavors, order.theme, '', 'New', '', ''
     ]);
     const row = sheet.getLastRow();
@@ -122,9 +122,11 @@ function ordersSheet_() {
 
 /** Booked dates as "YYYY-MM-DD" strings, from the first column of the Booked dates tab. */
 function bookedDates_() {
-  const sheet = book_().getSheetByName(BOOKED_TAB);
+  const ss = book_();
+  const sheet = ss.getSheetByName(BOOKED_TAB);
   if (!sheet || sheet.getLastRow() < 2) return [];
-  const tz = Session.getScriptTimeZone();
+  // the sheet's own time zone, so 12/24 stays 12/24 whatever zone the script runs in
+  const tz = ss.getSpreadsheetTimeZone();
   return sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues()
     .map(r => r[0])
     .filter(v => isDate_(v) || /^\d{4}-\d{2}-\d{2}$/.test(String(v).trim()))
@@ -145,9 +147,8 @@ function savePhotos_(order, photos) {
   const usable = photos.slice(0, MAX_PHOTOS).filter(p => p && typeof p.data === 'string' && /^image\//.test(String(p.type)));
   if (!usable.length) return '';
   const [, m, d] = order.date.split('-');
-  const now = new Date();
-  const folder = photosRoot_().createFolder(
-    order.name + ' ' + (now.getMonth() + 1) + '-' + now.getDate() + ' (for ' + Number(m) + '/' + Number(d) + ')');
+  const today = Utilities.formatDate(new Date(), book_().getSpreadsheetTimeZone(), 'M-d');
+  const folder = photosRoot_().createFolder(order.name + ' ' + today + ' (for ' + Number(m) + '/' + Number(d) + ')');
   usable.forEach((p, i) => {
     const bytes = Utilities.base64Decode(p.data);
     if (bytes.length > MAX_PHOTO_BYTES) return;
