@@ -12,6 +12,9 @@
 
 // Where order emails go. Blank = the Google account that owns this script.
 const NOTIFY_EMAIL = '';
+// Only needed if this script was created on its own at script.google.com (not from the sheet's
+// Extensions menu): paste the sheet's ID, the long part of its address between /d/ and /edit.
+const SPREADSHEET_ID = '';
 const ORDERS_TAB = 'Orders';
 const BOOKED_TAB = 'Booked dates';
 const PHOTOS_FOLDER = 'Order Photos';
@@ -90,6 +93,10 @@ function doPost(e) {
 
 // ---------- helpers ----------
 
+function book_() {
+  return SPREADSHEET_ID ? SpreadsheetApp.openById(SPREADSHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
+}
+
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -103,7 +110,7 @@ function notifyEmail_() {
 }
 
 function ordersSheet_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = book_();
   let sheet = ss.getSheetByName(ORDERS_TAB);
   if (!sheet) sheet = ss.insertSheet(ORDERS_TAB);
   if (sheet.getLastRow() === 0) {
@@ -115,7 +122,7 @@ function ordersSheet_() {
 
 /** Booked dates as "YYYY-MM-DD" strings, from the first column of the Booked dates tab. */
 function bookedDates_() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(BOOKED_TAB);
+  const sheet = book_().getSheetByName(BOOKED_TAB);
   if (!sheet || sheet.getLastRow() < 2) return [];
   const tz = Session.getScriptTimeZone();
   return sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues()
@@ -172,7 +179,7 @@ function sendEmail_(order, folderUrl) {
     folderUrl ? 'Inspiration photos: ' + folderUrl : 'No photos attached.',
     '',
     'Reply to this email to answer ' + order.name.split(' ')[0] + ' directly.',
-    'All orders: ' + SpreadsheetApp.getActiveSpreadsheet().getUrl()
+    'All orders: ' + book_().getUrl()
   ];
   MailApp.sendEmail({
     to: notifyEmail_(),

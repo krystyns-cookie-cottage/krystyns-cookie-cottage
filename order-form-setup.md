@@ -36,6 +36,18 @@ Google refreshes a published sheet every few minutes, so edits can take ~5 minut
    - Click **Deploy** and copy the **Web app URL** (ends in `/exec`).
 6. Paste that URL into `config.js` after `orderEndpoint:`.
 
+### "Sorry, unable to open the file at this time"
+
+This means the browser is signed into more than one Google account and Apps Script opened under the wrong one.
+
+- **Easiest:** open a private/incognito window, sign into only the account that owns the sheet, then Extensions → Apps Script.
+- **Or:** on the error page, change `/u/0/` in the address to `/u/1/` (or `/u/2/`) until it opens.
+- **Or create the script on its own:** go to [script.google.com](https://script.google.com) → **New project**, paste in `Code.gs`,
+  and put the sheet's ID in `const SPREADSHEET_ID = '';` (the long part of the sheet's address between `/d/` and `/edit`).
+  Then continue from step 4 above (run **setup**, deploy).
+
+A work or school Google account may block Apps Script entirely. Use a personal Gmail account instead.
+
 ## 4. Test it locally
 
 1. Start the local preview (`cookie-site` in `.claude/launch.json`, or `python -m http.server 5391` in this folder) and open http://localhost:5391.
