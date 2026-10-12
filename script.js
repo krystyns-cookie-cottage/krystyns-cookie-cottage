@@ -232,9 +232,11 @@
   lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.close(); });
 
   /* ---------------- classes & events (from Google Sheets) ---------------- */
-  // Both Google links live in config.js (see events-sheet-setup.md and order-form-setup.md).
+  // The Google script link lives in config.js (see order-form-setup.md). It serves the class list and
+  // takes orders. Left empty, the site reads the local events.csv sample and the order form is a demo.
   const CONFIG = window.COTTAGE_CONFIG || {};
-  // Left empty, the site reads the local events.csv template instead.
+  const GOOGLE_SCRIPT = CONFIG.googleScript || CONFIG.orderEndpoint || '';
+  // Optional: a sheet's "Publish to web" CSV link instead of the script (older setup)
   const EVENTS_SHEET_CSV = CONFIG.eventsSheetCsv || '';
   const FACEBOOK_URL = 'https://www.facebook.com/p/Krystyns-Cookie-Cottage-61581379451408/';
 
@@ -345,12 +347,23 @@
   }
 
   async function loadEvents() {
-    $('#sampleNote').hidden = !!EVENTS_SHEET_CSV;
+    $('#sampleNote').hidden = !!(EVENTS_SHEET_CSV || GOOGLE_SCRIPT);
     eventsEl.innerHTML = '<p class="events-status">Loading the class calendar…</p>';
     try {
-      const res = await fetch(EVENTS_SHEET_CSV || 'events.csv', { cache: 'no-store' });
-      if (!res.ok) throw new Error(res.status);
-      renderEvents(parseCSV(await res.text()).map(toEvent));
+      let rows;
+      if (!EVENTS_SHEET_CSV && GOOGLE_SCRIPT) {
+        // rows straight from the Classes tab, already keyed by column name
+        const res = await fetch(`${GOOGLE_SCRIPT}?action=classes`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        if (!Array.isArray(data.classes)) throw new Error('no classes');
+        rows = data.classes;
+      } else {
+        const res = await fetch(EVENTS_SHEET_CSV || 'events.csv', { cache: 'no-store' });
+        if (!res.ok) throw new Error(res.status);
+        rows = parseCSV(await res.text());
+      }
+      renderEvents(rows.map(toEvent));
     } catch (e) {
       eventsEl.innerHTML = `<p class="events-status">The class calendar didn't load. Upcoming classes are posted on <a href="${FACEBOOK_URL}" target="_blank" rel="noopener">Facebook</a>.</p>`;
     }
@@ -373,7 +386,7 @@
   const dateInput = $('#f-date');
   dateInput.min = new Date().toISOString().slice(0, 10);
 
-  const ORDER_ENDPOINT = CONFIG.orderEndpoint || '';
+  const ORDER_ENDPOINT = GOOGLE_SCRIPT;
   const MAX_PHOTOS = 5;
   const submitBtn = $('button[type=submit]', form);
   const photoInput = $('#f-photos');

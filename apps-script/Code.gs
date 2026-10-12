@@ -1,8 +1,9 @@
 /**
- * Krystyn's Cookie Cottage: order form backend.
+ * Krystyn's Cookie Cottage: the website's link to the Google Sheet.
  *
- * Lives inside the Google Sheet (Extensions > Apps Script). The website's order form posts here:
- *   - each inquiry becomes a row on the "Orders" tab
+ * Lives inside the Google Sheet (Extensions > Apps Script). The website uses it for:
+ *   - the class list: rows on the "Classes" tab (GET ?action=classes)
+ *   - the order form: each inquiry becomes a row on the "Orders" tab
  *   - inspiration photos go into Drive: "Order Photos" > "<Name> <M-D>"
  *   - an email goes to NOTIFY_EMAIL
  *   - dates on the "Booked dates" tab are refused
@@ -15,7 +16,8 @@ const NOTIFY_EMAIL = '';
 // Only needed if this script was created on its own at script.google.com (not from the sheet's
 // Extensions menu): paste the sheet's ID, the long part of its address between /d/ and /edit.
 const SPREADSHEET_ID = '';
-const VERSION = '2026-10-12 dates-fix-2';
+const VERSION = '2026-10-12 classes';
+const CLASSES_TAB = 'Classes';
 const ORDERS_TAB = 'Orders';
 const BOOKED_TAB = 'Booked dates';
 const PHOTOS_FOLDER = 'Order Photos';
@@ -31,11 +33,14 @@ function setup() {
   Logger.log('Ready. Order emails go to: ' + notifyEmail_());
 }
 
-/** GET ?action=booked -> {"booked":["2026-12-24", ...]} for the date picker. */
+/**
+ * GET ?action=classes -> {"classes":[{"date":"11/14/2026","title":...}, ...]} for the class list
+ * GET ?action=booked  -> {"booked":["2026-12-24", ...]} for the order form's date picker
+ */
 function doGet(e) {
-  if (e && e.parameter && e.parameter.action === 'booked') {
-    return json_({ booked: bookedDates_() });
-  }
+  const action = e && e.parameter ? e.parameter.action : '';
+  if (action === 'classes') return json_({ classes: classes_() });
+  if (action === 'booked') return json_({ booked: bookedDates_() });
   return json_({ ok: true, service: "Krystyn's Cookie Cottage orders", version: VERSION });
 }
 
@@ -92,7 +97,35 @@ function doPost(e) {
   return json_({ ok: true });
 }
 
+/** Any edit to the sheet clears the saved class list, so changes show on the website right away. */
+function onEdit() {
+  CacheService.getScriptCache().remove('classes');
+}
+
 // ---------- helpers ----------
+
+/**
+ * Classes tab rows as objects keyed by column name ("Ticket link" -> "ticket_link"), read exactly as
+ * displayed. Saved for 60 seconds so a busy page doesn't re-read the sheet on every visit.
+ */
+function classes_() {
+  const cache = CacheService.getScriptCache();
+  const saved = cache.get('classes');
+  if (saved) return JSON.parse(saved);
+  const sheet = book_().getSheetByName(CLASSES_TAB);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+  const values = sheet.getDataRange().getDisplayValues();
+  const head = values.shift().map(h => String(h).trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''));
+  const rows = values
+    .filter(r => r.some(v => String(v).trim()))
+    .map(r => {
+      const row = {};
+      head.forEach((h, i) => { if (h) row[h] = String(r[i]).trim(); });
+      return row;
+    });
+  cache.put('classes', JSON.stringify(rows), 60);
+  return rows;
+}
 
 function book_() {
   return SPREADSHEET_ID ? SpreadsheetApp.openById(SPREADSHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();

@@ -12,6 +12,10 @@
       "statusCode": 404
     },
     {
+      "route": "/netlify.toml",
+      "statusCode": 404
+    },
+    {
       "route": "/",
       "headers": {
         "Cache-Control": "no-cache"
@@ -28,6 +32,17 @@
       "headers": {
         "Cache-Control": "no-cache"
       }
+    },
+    {
+      "route": "/config.js",
+      "headers": {
+        "Cache-Control": "no-cache"
+      }
     }
-  ]
+  ],
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404.html"
+    }
+  }
 }

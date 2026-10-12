@@ -3,18 +3,10 @@
 The "Cookie classes & events" section on the site reads from a Google Sheet.
 Krystyn adds a row, and the class shows up on the website. No code or developer needed.
 
-## One-time setup (developer, ~5 minutes)
+## One-time setup
 
-1. In Krystyn's Google account, create a new Google Sheet named **Cookie Cottage Classes**.
-2. **File → Import → Upload** `events.csv` from this folder. Choose **Replace current sheet**.
-3. **File → Share → Publish to web**
-   - Link: pick the sheet tab (e.g. *Sheet1*), format **Comma-separated values (.csv)**
-   - Click **Publish** and copy the link. It looks like
-     `https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=0&single=true&output=csv`
-4. Open `config.js` and paste the link between the quotes after `eventsSheetCsv:`.
-5. Deploy. The "Sample dates" note on the site disappears once a sheet link is set.
-
-Share the sheet with Krystyn (or create it in her account) and give yourself edit access.
+The Classes tab lives in the same Google Sheet as orders, and the website reads it through the sheet's script.
+Setup steps: **order-form-setup.md**.
 
 ## For Krystyn: how to add or change a class
 
@@ -42,4 +34,4 @@ How the site uses it:
 - **Past dates disappear on their own.** No need to delete old rows.
 - The weekday ("Saturday") is added automatically from the date.
 
-Changes show up on the site within about 5 minutes (Google updates published sheets on a short delay).
+Changes show up on the site within a few seconds.

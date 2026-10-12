@@ -1,0 +1,65 @@
+# Netlify settings for Krystyn's Cookie Cottage (the launch host).
+# Plain HTML site: no build step, publish the folder as-is.
+# Unlike the Azure review site, there is no "noindex" header here, so Google can list the real site.
+
+[build]
+  publish = "."
+  command = ""
+
+# Always check for the newest page, settings and sample classes (no stale copies after an update)
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/config.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/events.csv"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Keep the setup notes, Google script and host settings out of public view
+[[redirects]]
+  from = "/apps-script/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.github/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/events-sheet-setup.md"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/order-form-setup.md"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/staticwebapp.config.json"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify.toml"
+  to = "/404.html"
+  status = 404
+  force = true
