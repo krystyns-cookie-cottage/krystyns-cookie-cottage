@@ -232,9 +232,10 @@
   lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.close(); });
 
   /* ---------------- classes & events (from Google Sheets) ---------------- */
-  // Paste the sheet's "Publish to web" CSV link here (see events-sheet-setup.md).
+  // Both Google links live in config.js (see events-sheet-setup.md and order-form-setup.md).
+  const CONFIG = window.COTTAGE_CONFIG || {};
   // Left empty, the site reads the local events.csv template instead.
-  const EVENTS_SHEET_CSV = '';
+  const EVENTS_SHEET_CSV = CONFIG.eventsSheetCsv || '';
   const FACEBOOK_URL = 'https://www.facebook.com/p/Krystyns-Cookie-Cottage-61581379451408/';
 
   const eventsEl = $('#events');
@@ -307,11 +308,15 @@
       const seatsHtml = seats ? `<div class="seats">${pct != null ? `<span class="seat-bar"><i style="width:${pct}%"></i></span>` : ''}${seats}</div>` : '';
 
       const label = `<span class="sr-only"> for ${esc(ev.title)}</span>`;
+      // paid class with no ticket link yet -> reserve through the order form; free event with no link -> no button
+      const paid = /^\$?\d+(\.\d\d)?$/.test(ev.price);
       const action = ev.full
         ? `<button class="btn btn-small" data-event="${i}" data-action="waitlist">Join the waitlist${label}</button>`
         : ev.link
           ? `<a class="btn btn-small" href="${esc(ev.link)}" target="_blank" rel="noopener">Get tickets${label}</a>`
-          : `<button class="btn btn-small" data-event="${i}" data-action="reserve">Reserve a seat${label}</button>`;
+          : paid
+            ? `<button class="btn btn-small" data-event="${i}" data-action="reserve">Reserve a seat${label}</button>`
+            : '';
 
       return `<article class="event${ev.full ? ' is-full' : ''}">
         <div class="event-date"><div class="m">${month}</div><div class="d">${day}</div></div>
@@ -365,14 +370,81 @@
   }));
 
   // date picker: no past dates
-  $('#f-date').min = new Date().toISOString().slice(0, 10);
+  const dateInput = $('#f-date');
+  dateInput.min = new Date().toISOString().slice(0, 10);
 
-  form.addEventListener('submit', e => {
+  const ORDER_ENDPOINT = CONFIG.orderEndpoint || '';
+  const MAX_PHOTOS = 5;
+  const submitBtn = $('button[type=submit]', form);
+  const photoInput = $('#f-photos');
+
+  // Dates Krystyn has marked as booked (Booked dates tab), checked as the customer picks one
+  let bookedDates = new Set();
+  if (ORDER_ENDPOINT) {
+    fetch(`${ORDER_ENDPOINT}?action=booked`)
+      .then(r => r.json())
+      .then(d => { bookedDates = new Set(d.booked || []); checkBooked(); })
+      .catch(() => {});
+  }
+  const bookedMsg = 'That date is fully booked. Please choose another date, or message Krystyn to ask.';
+  function checkBooked() {
+    const isBooked = bookedDates.has(dateInput.value);
+    dateInput.setCustomValidity(isBooked ? bookedMsg : '');
+    if (isBooked) { err.textContent = bookedMsg; err.hidden = false; dateInput.setAttribute('aria-invalid', 'true'); }
+    else if (err.textContent === bookedMsg) { err.hidden = true; dateInput.removeAttribute('aria-invalid'); }
+    return isBooked;
+  }
+  dateInput.addEventListener('change', checkBooked);
+
+  photoInput.addEventListener('change', () => {
+    if (photoInput.files.length > MAX_PHOTOS) {
+      err.textContent = `Please choose up to ${MAX_PHOTOS} photos. You can text or email Krystyn any extras.`;
+      err.hidden = false;
+      photoInput.value = '';
+    }
+  });
+
+  // Shrink phone photos before upload: longest side 1600px, JPEG
+  function shrinkPhoto(file) {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * scale);
+        c.height = Math.round(img.naturalHeight * scale);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        const data = c.toDataURL('image/jpeg', 0.82).split(',')[1];
+        resolve({ name: file.name.replace(/\.[^.]+$/, '') + '.jpg', type: 'image/jpeg', data });
+      };
+      img.onerror = () => {
+        // A format the browser can't draw: send it as is if it's small enough, otherwise skip it
+        URL.revokeObjectURL(url);
+        if (file.size > 4e6) return resolve(null);
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type || 'application/octet-stream', data: String(reader.result).split(',')[1] });
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      };
+      img.src = url;
+    });
+  }
+
+  function showSuccess() {
+    $('#successName').textContent = $('#f-name').value.trim().split(' ')[0] || 'friend';
+    form.hidden = true; success.hidden = false; success.focus();
+  }
+
+  form.addEventListener('submit', async e => {
     e.preventDefault();
+    if (submitBtn.disabled) return;
     const required = $$('[required]', form);
     const bad = required.filter(f => !f.checkValidity());
     required.forEach(f => f.setAttribute('aria-invalid', bad.includes(f)));
     if (bad.length) {
+      if (bad.includes(dateInput) && checkBooked()) { dateInput.focus(); return; }
       const names = bad.map(f => $(`label[for="${f.id}"]`).childNodes[0].textContent.trim().replace(/\?$/, '').toLowerCase());
       err.textContent = `Please fill in: ${names.join(', ')}.`;
       err.hidden = false;
@@ -380,9 +452,36 @@
       return;
     }
     err.hidden = true;
-    // Live site: post to Jotform here (or swap this form for the Jotform embed).
-    $('#successName').textContent = $('#f-name').value.trim().split(' ')[0] || 'friend';
-    form.hidden = true; success.hidden = false; success.focus();
+
+    // No Google link set yet (review site): show the thank-you without sending anything
+    if (!ORDER_ENDPOINT) return showSuccess();
+
+    submitBtn.disabled = true;
+    const label = submitBtn.textContent;
+    submitBtn.textContent = photoInput.files.length ? 'Uploading photos…' : 'Sending…';
+    try {
+      const photos = (await Promise.all([...photoInput.files].slice(0, MAX_PHOTOS).map(shrinkPhoto))).filter(Boolean);
+      const v = id => $(id).value.trim();
+      const payload = {
+        name: v('#f-name'), email: v('#f-email'), phone: v('#f-phone'), date: v('#f-date'),
+        occasion: v('#f-occasion'), quantity: v('#f-qty'),
+        flavors: $$('input[name=flavor]:checked', form).map(c => c.value).join(', '),
+        theme: v('#f-theme'), website: form.elements.website ? form.elements.website.value : '',
+        photos
+      };
+      // text/plain keeps this a "simple" request, which Google Apps Script accepts from any site
+      const res = await fetch(ORDER_ENDPOINT, { method: 'POST', body: JSON.stringify(payload) });
+      const out = await res.json();
+      if (out.ok) return showSuccess();
+      if (out.booked) { bookedDates.add(payload.date); checkBooked(); dateInput.focus(); return; }
+      throw new Error(out.error || 'send failed');
+    } catch (ex) {
+      err.textContent = 'Your inquiry didn’t send. Please try again, or email hello@krystynscookiecottage.com.';
+      err.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = label;
+    }
   });
   $('#orderAgain').addEventListener('click', () => {
     form.reset(); form.hidden = false; success.hidden = true;

@@ -3,9 +3,31 @@
     "X-Robots-Tag": "noindex, nofollow"
   },
   "routes": [
-    { "route": "/*.md", "statusCode": 404 },
-    { "route": "/", "headers": { "Cache-Control": "no-cache" } },
-    { "route": "/index.html", "headers": { "Cache-Control": "no-cache" } },
-    { "route": "/events.csv", "headers": { "Cache-Control": "no-cache" } }
+    {
+      "route": "/*.md",
+      "statusCode": 404
+    },
+    {
+      "route": "/apps-script/*",
+      "statusCode": 404
+    },
+    {
+      "route": "/",
+      "headers": {
+        "Cache-Control": "no-cache"
+      }
+    },
+    {
+      "route": "/index.html",
+      "headers": {
+        "Cache-Control": "no-cache"
+      }
+    },
+    {
+      "route": "/events.csv",
+      "headers": {
+        "Cache-Control": "no-cache"
+      }
+    }
   ]
 }

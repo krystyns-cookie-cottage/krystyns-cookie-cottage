@@ -11,7 +11,7 @@ Krystyn adds a row, and the class shows up on the website. No code or developer 
    - Link: pick the sheet tab (e.g. *Sheet1*), format **Comma-separated values (.csv)**
    - Click **Publish** and copy the link. It looks like
      `https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=0&single=true&output=csv`
-4. Open `script.js`, find `const EVENTS_SHEET_CSV = '';` and paste the link between the quotes.
+4. Open `config.js` and paste the link between the quotes after `eventsSheetCsv:`.
 5. Deploy. The "Sample dates" note on the site disappears once a sheet link is set.
 
 Share the sheet with Krystyn (or create it in her account) and give yourself edit access.

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Allura&family=Caveat:wght@500;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Young+Serif&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=17">
+  <link rel="stylesheet" href="styles.css?v=18">
 </head>
 <body>
 
@@ -303,6 +303,7 @@
       </div>
 
       <form class="order-form" id="orderForm" novalidate>
+        <div class="hp" aria-hidden="true"><label>Leave this empty <input name="website" tabindex="-1" autocomplete="off"></label></div>
         <div class="field">
           <label for="f-name">Your name</label>
           <input id="f-name" name="name" autocomplete="name" required>
@@ -357,12 +358,12 @@
           <textarea id="f-theme" name="theme" rows="4" placeholder="e.g. Sage and blush bridal shower, a bow, the bride's initials, 'She's tying the knot'" required></textarea>
         </div>
         <div class="field field-full">
-          <label for="f-photos">Inspiration photos <span class="opt">(optional)</span></label>
+          <label for="f-photos">Inspiration photos <span class="opt">(optional, up to 5)</span></label>
           <input id="f-photos" name="photos" type="file" accept="image/*" multiple>
         </div>
         <div class="form-foot field-full">
           <button class="btn" type="submit">Send my inquiry</button>
-          <p class="form-fine">Secure form powered by Jotform.</p>
+          <p class="form-fine">Your details go straight to Krystyn and nowhere else.</p>
         </div>
         <p class="form-error" id="formError" role="alert" hidden></p>
       </form>
@@ -475,6 +476,7 @@
 </dialog>
 
 
-<script src="script.js?v=17"></script>
+<script src="config.js?v=1"></script>
+<script src="script.js?v=18"></script>
 </body>
 </html>

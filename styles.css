@@ -275,6 +275,7 @@ p { margin: 0; }
 .checks label { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; padding: 8px 14px; border-radius: 999px; background: var(--paper); border: 1.5px solid #E2D3CC; cursor: pointer; }
 .checks input { accent-color: var(--sage-deep); width: 18px; height: 18px; }
 .form-foot { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 6px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-fine { font-size: .88rem; color: var(--forest-soft); }
 .form-error { grid-column: 1 / -1; color: #A2453F; font-weight: 700; }
 .order-success { text-align: center; padding: 30px 10px; }
