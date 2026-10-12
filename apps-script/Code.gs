@@ -15,6 +15,7 @@ const NOTIFY_EMAIL = '';
 // Only needed if this script was created on its own at script.google.com (not from the sheet's
 // Extensions menu): paste the sheet's ID, the long part of its address between /d/ and /edit.
 const SPREADSHEET_ID = '';
+const VERSION = '2026-10-12 dates-fix';
 const ORDERS_TAB = 'Orders';
 const BOOKED_TAB = 'Booked dates';
 const PHOTOS_FOLDER = 'Order Photos';
@@ -35,7 +36,7 @@ function doGet(e) {
   if (e && e.parameter && e.parameter.action === 'booked') {
     return json_({ booked: bookedDates_() });
   }
-  return json_({ ok: true, service: "Krystyn's Cookie Cottage orders" });
+  return json_({ ok: true, service: "Krystyn's Cookie Cottage orders", version: VERSION });
 }
 
 /** POST (JSON body sent as text/plain) -> {"ok":true} | {"ok":false,"booked":true} | {"ok":false,"error":"..."} */
