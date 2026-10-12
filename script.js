@@ -381,7 +381,8 @@
   // Dates Krystyn has marked as booked (Booked dates tab), checked as the customer picks one
   let bookedDates = new Set();
   if (ORDER_ENDPOINT) {
-    fetch(`${ORDER_ENDPOINT}?action=booked`)
+    // no-store: the booked list changes whenever Krystyn edits the sheet, so never reuse a saved copy
+    fetch(`${ORDER_ENDPOINT}?action=booked`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => { bookedDates = new Set(d.booked || []); checkBooked(); })
       .catch(() => {});
