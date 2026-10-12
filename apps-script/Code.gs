@@ -15,7 +15,7 @@ const NOTIFY_EMAIL = '';
 // Only needed if this script was created on its own at script.google.com (not from the sheet's
 // Extensions menu): paste the sheet's ID, the long part of its address between /d/ and /edit.
 const SPREADSHEET_ID = '';
-const VERSION = '2026-10-12 dates-fix';
+const VERSION = '2026-10-12 dates-fix-2';
 const ORDERS_TAB = 'Orders';
 const BOOKED_TAB = 'Booked dates';
 const PHOTOS_FOLDER = 'Order Photos';
@@ -123,19 +123,30 @@ function ordersSheet_() {
 
 /** Booked dates as "YYYY-MM-DD" strings, from the first column of the Booked dates tab. */
 function bookedDates_() {
-  const ss = book_();
-  const sheet = ss.getSheetByName(BOOKED_TAB);
+  const sheet = book_().getSheetByName(BOOKED_TAB);
   if (!sheet || sheet.getLastRow() < 2) return [];
-  // the sheet's own time zone, so 12/24 stays 12/24 whatever zone the script runs in
-  const tz = ss.getSpreadsheetTimeZone();
-  return sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues()
-    .map(r => r[0])
-    .filter(v => isDate_(v) || /^\d{4}-\d{2}-\d{2}$/.test(String(v).trim()))
-    .map(v => (isDate_(v) ? Utilities.formatDate(v, tz, 'yyyy-MM-dd') : String(v).trim()));
+  // Read dates exactly as the sheet shows them ("12/24/2026"), so no time zone can shift them
+  return sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getDisplayValues()
+    .map(r => isoDate_(r[0]))
+    .filter(Boolean);
 }
 
-function isDate_(v) {
-  return Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v.getTime());
+/** "12/24/2026", "12/24/26" or "2026-12-24" -> "2026-12-24"; anything else -> '' */
+function isoDate_(text) {
+  const t = String(text).trim();
+  let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) return m[1] + '-' + pad2_(m[2]) + '-' + pad2_(m[3]);
+  m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  if (m) return (m[3].length === 2 ? '20' + m[3] : m[3]) + '-' + pad2_(m[1]) + '-' + pad2_(m[2]);
+  return '';
+}
+
+function pad2_(n) {
+  return ('0' + Number(n)).slice(-2);
+}
+
+function timeZone_() {
+  return book_().getSpreadsheetTimeZone() || Session.getScriptTimeZone() || 'America/New_York';
 }
 
 function photosRoot_() {
@@ -148,7 +159,7 @@ function savePhotos_(order, photos) {
   const usable = photos.slice(0, MAX_PHOTOS).filter(p => p && typeof p.data === 'string' && /^image\//.test(String(p.type)));
   if (!usable.length) return '';
   const [, m, d] = order.date.split('-');
-  const today = Utilities.formatDate(new Date(), book_().getSpreadsheetTimeZone(), 'M-d');
+  const today = Utilities.formatDate(new Date(), timeZone_(), 'M-d');
   const folder = photosRoot_().createFolder(order.name + ' ' + today + ' (for ' + Number(m) + '/' + Number(d) + ')');
   usable.forEach((p, i) => {
     const bytes = Utilities.base64Decode(p.data);
